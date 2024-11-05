@@ -13898,7 +13898,7 @@ with pkgs;
   zed = callPackage ../development/tools/zed { };
 
   zellij = callPackage ../tools/misc/zellij {
-    inherit (darwin.apple_sdk.frameworks) DiskArbitration Foundation;
+    inherit (darwin.apple_sdk_12_3.frameworks) DiskArbitration Foundation;
   };
 
   zenith = callPackage ../tools/system/zenith {

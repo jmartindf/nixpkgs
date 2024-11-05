@@ -1,30 +1,32 @@
-{ lib
-, fetchFromGitHub
-, rustPlatform
-, stdenv
-, installShellFiles
-, pkg-config
-, libiconv
-, openssl
-, DiskArbitration
-, Foundation
-, mandown
-, zellij
-, testers
+{
+  lib,
+  fetchFromGitHub,
+  rustPlatform,
+  stdenv,
+  installShellFiles,
+  pkg-config,
+  libiconv,
+  openssl,
+  DiskArbitration,
+  Foundation,
+  mandown,
+  zellij,
+  testers,
+  curl,
 }:
 
 rustPlatform.buildRustPackage rec {
   pname = "zellij";
-  version = "0.41.0";
+  version = "0.41.1";
 
   src = fetchFromGitHub {
     owner = "zellij-org";
     repo = "zellij";
     rev = "v${version}";
-    hash = "sha256-A+JVWYz0t9cVA8XZciOwDkCecsC2r5TU2O9i9rVg7do=";
+    hash = "sha256-EUoJHM0Jm0uFKFeHhtzon/ZRC615SHfYa1gr4RnCNBw=";
   };
 
-  cargoHash = "sha256-aplBfsJCEHuatkbp236ZF4VyGm0/lw3UY9IZCQaUCJU=";
+  cargoHash = "sha256-rI3pa0dvC/OVJz8gzD1bM0Q+8OWwvGj+jGDEMSbSb2I=";
 
   nativeBuildInputs = [
     mandown
@@ -34,28 +36,33 @@ rustPlatform.buildRustPackage rec {
 
   env.OPENSSL_NO_VENDOR = 1;
 
-  buildInputs = [
-    openssl
-  ] ++ lib.optionals stdenv.hostPlatform.isDarwin [
-    libiconv
-    DiskArbitration
-    Foundation
-  ];
+  buildInputs =
+    [
+      openssl
+    ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [
+      libiconv
+      DiskArbitration
+      Foundation
+      curl
+    ];
 
   preCheck = ''
     HOME=$TMPDIR
   '';
 
-  postInstall = ''
-    mandown docs/MANPAGE.md > zellij.1
-    installManPage zellij.1
+  postInstall =
+    ''
+      mandown docs/MANPAGE.md > zellij.1
+      installManPage zellij.1
 
-  '' + lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
-    installShellCompletion --cmd $pname \
-      --bash <($out/bin/zellij setup --generate-completion bash) \
-      --fish <($out/bin/zellij setup --generate-completion fish) \
-      --zsh <($out/bin/zellij setup --generate-completion zsh)
-  '';
+    ''
+    + lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+      installShellCompletion --cmd $pname \
+        --bash <($out/bin/zellij setup --generate-completion bash) \
+        --fish <($out/bin/zellij setup --generate-completion fish) \
+        --zsh <($out/bin/zellij setup --generate-completion zsh)
+    '';
 
   passthru.tests.version = testers.testVersion { package = zellij; };
 
@@ -64,7 +71,12 @@ rustPlatform.buildRustPackage rec {
     homepage = "https://zellij.dev/";
     changelog = "https://github.com/zellij-org/zellij/blob/v${version}/CHANGELOG.md";
     license = with licenses; [ mit ];
-    maintainers = with maintainers; [ therealansh _0x4A6F abbe pyrox0 ];
+    maintainers = with maintainers; [
+      therealansh
+      _0x4A6F
+      abbe
+      pyrox0
+    ];
     mainProgram = "zellij";
   };
 }

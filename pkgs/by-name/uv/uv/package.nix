@@ -12,14 +12,14 @@
 
 python3Packages.buildPythonApplication rec {
   pname = "uv";
-  version = "0.4.30";
+  version = "0.5.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "astral-sh";
     repo = "uv";
     rev = "refs/tags/${version}";
-    hash = "sha256-xy/fgy3+YvSdfq5ngPVbAmRpYyJH27Cft5QxBwFQumU=";
+    hash = "sha256-CTMEjqV3Cn/Zt91OpNwF3bTLoTD/TPeRsGvLohI15Ng=";
   };
 
   cargoDeps = rustPlatform.importCargoLock {
